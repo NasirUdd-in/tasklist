@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Welcome to the Home Page</h2>
+<p>This is the home page content. You can customize it as needed.</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" name="logout">Logout</button>
+</form>
+
+<h3>Tasks:</h3>
+<div class="row">
+    <div class="col-md-12">
+        <form method="get">
+            <div class="input-group">
+                <input type="text" class="form-control" name="search" placeholder="Search by title">
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </div>
+        </form>
+
+        <form method="get">
+            <div class="form-group">
+                <label for="creation_date">Filter by Creation Date:</label>
+                <input type="date" id="creation_date" name="creation_date" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Apply</button>
+        </form>
+
+        <form method="get">
+            <div class="form-group">
+                <label for="due_date">Filter by Due Date:</label>
+                <input type="date" id="due_date" name="due_date" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Apply</button>
+        </form>
+
+        <form method="get">
+            <div class="form-group">
+                <label for="priority">Filter by Priority:</label>
+                <select id="priority" name="priority" class="form-control">
+                    <option value="">-- Select Priority --</option>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Apply</button>
+        </form>
+    </div>
+</div>
+
+<form method="get">
+    <label for="is_complete">Filter by Completion Status:</label>
+    <select id="is_complete" name="is_complete">
+        <option value="">-- Select Status --</option>
+        <option value="true">Complete</option>
+        <option value="false">Incomplete</option>
+    </select>
+    <button type="submit">Apply</button>
+</form>
+
+
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Due Date</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Last Updated</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for task in tasks %}
+            <tr>
+                <td>{{ task.title }}</td>
+                <td>{{ task.description }}</td>
+                <td>{{ task.due_date }}</td>
+                <td>{{ task.priority }}</td>
+                <td>{% if task.is_complete %}Complete{% else %}Incomplete{% endif %}</td>
+                <td>{{ task.creation_datetime }}</td>
+                <td>{{ task.last_update_datetime }}</td>
+                <td>
+                    <a href="{% url 'task-update' task.pk %}" class="btn btn-primary">Update</a>
+                    <a href="#" class="btn btn-danger" onclick="confirmDelete('{{ task.title }}', '{{ task.id }}')">Delete</a>
+                </td>
+                
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<script>
+    function confirmDelete(taskTitle, taskId) {
+        if (confirm(`Are you sure you want to delete the task "${taskTitle}"?`)) {
+            // If the user confirms, redirect to a delete view (e.g., 'task-delete') with the task ID
+            window.location.href = `/task/${taskId}/delete/`;
+        }
+    }
+</script>
+
+
+{% endblock content %}
+
